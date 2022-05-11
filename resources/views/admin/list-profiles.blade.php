@@ -29,7 +29,7 @@
                             <td>{{ $profile->ship_name }}</td>
                             <td>{{ $profile->contact_fname}} {{ $profile->contact_lname }}</td>
                             <td>{{ $profile->contact_email }} </td>
-                            <td><button class="btn btn-primary">View Profile</button> </td>
+                            <td><a href="view-profile/{{ $profile->id }}"><button class="btn btn-primary">View Profile</button></a></td>
                         </tr>
                         @endforeach
                     </tbody>

@@ -5,12 +5,18 @@ namespace App\Http\Controllers\User;
 use App\Http\Controllers\Controller;
 use App\Models\Eexiprofile;
 use Illuminate\Http\Request;
+use App\Models\OtherFile;
 
 class EexiController extends Controller
 {
     public function createProfile()
     {
         return view('user.create-profile');
+    }
+
+    public function createProfileStepTwo()
+    {
+        return view('user.create-profile-step-two');
     }
 
     public function saveProfile(Request $request)
@@ -24,6 +30,39 @@ class EexiController extends Controller
         $eexi_profile->contact_lname = $request->contact_lname;
         $eexi_profile->contact_email = $request->contact_email;
         //files to be uploaded
+
+
+        $request->validate([
+            'ship_name' => 'required',
+            'imo_number' => 'required',
+            'ship_type' => 'required',
+            'company_name' => 'required',
+            'contact_fname' => 'required',
+            'contact_lname' => 'required',
+            'contact_email' => 'required | email',
+
+        ]);
+
+
+        $eexi_profile->save();
+        //     'ship_name' => $request->ship_name,
+        //     'imo_number' => $request->imo_number,
+        //     'ship_type' => $request->ship_type,
+        //     'company_name' => $request->company_name,
+        //     'contact_fname' => $request->contact_fname,
+        //     'contact_lname' => $request->contact_lname,
+        //     'contact_email' => $request->contact_email,
+        // ]);
+        //dd($eexi_profile->id);
+        $data['id'] = $eexi_profile->id;
+        $data['message'] = 'Great! You\'ve finished the first step. Let\'s upload the files now.';
+        return redirect('create-profile-step-two')->with($data);
+    }
+
+    public function saveProfileStepTwo(Request $request)
+    {
+        //dd($request->row_id);
+        $eexi_profile = new Eexiprofile();
         $eexi_profile->ship_particulars = $request->ship_particulars;
         $eexi_profile->cert_registry = $request->cert_registry;
         $eexi_profile->eiapp_cert = $request->eiapp_cert;
@@ -41,54 +80,48 @@ class EexiController extends Controller
         $eexi_profile->speedpower_curve = $request->speedpower_curve;
 
         $request->validate([
-            'ship_name' => 'required',
-            'imo_number' => 'required',
-            'ship_type' => 'required',
-            'company_name' => 'required',
-            'contact_fname' => 'required',
-            'contact_lname' => 'required',
-            'contact_email' => 'required | email',
             //uploads start here
             'ship_particulars' => 'required|mimes:pdf',
-            'cert_registry' => 'required',
-            'eiapp_cert' => 'required',
-            'capacity_plan' => 'required',
-            'sea_trial_report' => 'required',
-            'ship_safety_cert' => 'required',
-            'nox_tech_file' => 'required',
-            'electric_power_table' => 'required',
-            'iapp_cert' => 'required',
-            'iapp_record' => 'required',
-            'eiapp_cert' => 'required',
-            'machinery_particulars' => 'required',
-            'cert_classification' => 'required',
-            'approved_cargo' => 'required',
-            'speedpower_curve' => 'required'
+            'cert_registry' => 'required|mimes:pdf,doc,docx',
+            'eiapp_cert' => 'required|mimes:pdf,doc,docx',
+            'capacity_plan' => 'required|mimes:pdf,doc,docx',
+            //'sea_trial_report' => 'required',
+            'ship_safety_cert' => 'required|mimes:pdf,doc,docx',
+            'nox_tech_file' => 'required|mimes:pdf,doc,docx',
+            //'electric_power_table' => 'required',
+            'iapp_cert' => 'required|mimes:pdf,doc,docx',
+            'iapp_record' => 'required|mimes:pdf,doc,docx',
+            'eiapp_cert' => 'required|mimes:pdf,doc,docx',
+            'machinery_particulars' => 'required|mimes:pdf,doc,docx',
+            'cert_classification' => 'required|mimes:pdf,doc,docx',
+            'approved_cargo' => 'required|mimes:pdf,doc,docx',
+            //'speedpower_curve' => 'required'
         ]);
+
         //upload all files
         $ship_particulars = $request->file('ship_particulars')->store('clientdocs');
         $cert_registry = $request->file('cert_registry')->store('clientdocs');
         $eiapp_cert = $request->file('eiapp_cert')->store('clientdocs');
         $capacity_plan = $request->file('capacity_plan')->store('clientdocs');
-        $sea_trial_report = $request->file('sea_trial_report')->store('clientdocs');
+        if ($request->hasFile('sea_trial_report')) {
+            $sea_trial_report = $request->file('sea_trial_report')->store('clientdocs');
+        }
         $ship_safety_cert = $request->file('ship_safety_cert')->store('clientdocs');
         $nox_tech_file = $request->file('nox_tech_file')->store('clientdocs');
-        $electric_power_table = $request->file('electric_power_table')->store('clientdocs');
+        if ($request->hasFile('electric_power_table')) {
+            $electric_power_table = $request->file('electric_power_table')->store('clientdocs');
+        }
         $iapp_cert = $request->file('iapp_cert')->store('clientdocs');
         $iapp_record = $request->file('iapp_record')->store('clientdocs');
         $machinery_particulars = $request->file('machinery_particulars')->store('clientdocs');
         $cert_classification = $request->file('cert_classification')->store('clientdocs');
         $approved_cargo = $request->file('approved_cargo')->store('clientdocs');
-        $speedpower_curve = $request->file('speedpower_curve')->store('clientdocs');
+        if ($request->hasFile('speedpower_curve')) {
+            $speedpower_curve = $request->file('speedpower_curve')->store('clientdocs');
+        }
 
-        $eexi_profile->create([
-            'ship_name' => $request->ship_name,
-            'imo_number' => $request->imo_number,
-            'ship_type' => $request->ship_type,
-            'company_name' => $request->company_name,
-            'contact_fname' => $request->contact_fname,
-            'contact_lname' => $request->contact_lname,
-            'contact_email' => $request->contact_email,
+
+        Eexiprofile::where('id', $request->row_id)->update([
             //uploads start here
             'ship_particulars' => $ship_particulars,
             'cert_registry' => $cert_registry,
@@ -105,10 +138,10 @@ class EexiController extends Controller
             'cert_classification' => $cert_classification,
             'approved_cargo' => $approved_cargo,
             'speedpower_curve' => $speedpower_curve
-
         ]);
-        return back()->with('message', 'Profile created. We will give you fedback shortly.');
     }
+
+
 
     public function listProfiles()
     {
@@ -118,7 +151,10 @@ class EexiController extends Controller
 
     public function viewProfile(Request $request)
     {
+        $data['id'] = $request->id;
         $data['oneProfile'] = Eexiprofile::where('id', $request->id)->first();
+        $data['other_files_list'] = OtherFile::where('eexiprofiles_id', $request->id)->get();
+        //return $data['other_files_list'];
         return view('admin.view-profile')->with($data);
     }
 }
