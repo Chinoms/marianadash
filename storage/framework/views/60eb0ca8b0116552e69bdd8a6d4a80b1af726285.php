@@ -141,7 +141,7 @@
                 </div>
                 <ul class="nav nav-primary">
                     <li class="nav-item active">
-                        <a href="<?php echo e(url('')); ?>" class="collapsed" aria-expanded="false">
+                        <a href="<?php echo e(url('create-profile')); ?>" class="collapsed" aria-expanded="false">
                             <i class="fas fa-home"></i>
                             <p>Create Profile</p>
                         </a>
@@ -150,7 +150,7 @@
 
 
                     <li class="nav-item active">
-                        <a href="create-parcel" class="collapsed" aria-expanded="false">
+                        <a href="<?php echo e(url('list-profiles')); ?>" class="collapsed" aria-expanded="false">
                             <i class="fas fa-home"></i>
                             <p>List Profiles</p>
                         </a>

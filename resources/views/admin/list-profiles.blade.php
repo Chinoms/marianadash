@@ -8,8 +8,10 @@
         <div class="container">
             <div class="row">
 
-                @if(Auth::user()->hasRole('admin'))
-                dddsfs
+            @if(session()->has('message'))
+                <div class="alert alert-success">
+                    {{ session()->get('message') }}
+                </div>
                 @endif
 
                 <table class="table table-striped">

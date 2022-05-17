@@ -30,6 +30,7 @@ class EexiController extends Controller
         $eexi_profile->contact_fname = $request->contact_fname;
         $eexi_profile->contact_lname = $request->contact_lname;
         $eexi_profile->contact_email = $request->contact_email;
+        $eexi_profile->eexiprofiles_code = chr(rand(65, 90)) . chr(rand(65, 90)) . mt_rand(1111, 9999);
         //files to be uploaded
 
 
@@ -140,6 +141,8 @@ class EexiController extends Controller
             'approved_cargo' => $approved_cargo,
             'speedpower_curve' => $speedpower_curve
         ]);
+
+        return redirect('list-profiles')->with('message', 'Profile created. Documents uploaded. We\'ll be in touch shortly.');
     }
 
 
