@@ -13,9 +13,11 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::get('/', function () {
-    return view('welcome');
-});
+// Route::get('/', function () {
+//     return view('welcome');
+// });
+
+Route::get('/', 'App\Http\Controllers\User\EexiController@listProfiles')->middleware('auth');
 
 Route::get('/dashboard', function () {
     return view('dashboard');
@@ -29,5 +31,7 @@ Route::post('save-profile-step-two', 'App\Http\Controllers\User\EexiController@s
 Route::get('list-profiles', 'App\Http\Controllers\User\EexiController@listProfiles')->middleware('auth');
 Route::get('view-profile/{id}', 'App\Http\Controllers\User\EexiController@viewProfile')->middleware('auth');
 Route::post('upload-misc-files', 'App\Http\Controllers\User\OtherFilesController@uploadOtherFile')->middleware('auth')->name('uploadotherfiles');
-
+Route::post('ask-for-payment', 'App\Http\Controllers\Admin\TransactionsController@askForPayment')->middleware('auth')->name('askforpayment');
+Route::get('verifytransaction/{reference}/{id}', 'App\Http\Controllers\Admin\TransactionsController@verifyTransaction');
+Route::get('mark-as-paid/{id}', 'App\Http\Controllers\Admin\TransactionsController@markAsPaid')->middleware('auth');
 require __DIR__.'/auth.php';

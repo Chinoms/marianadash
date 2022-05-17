@@ -7,26 +7,22 @@
         <div class="container">
             <div class="row">
 
-                <?php if(Auth::user()->hasRole('admin')): ?>
-                dddsfs
-                <?php endif; ?>
-
                 <?php if(session()->has('message')): ?>
-                    <div class="alert alert-success">
-                        <?php echo e(session()->get('message')); ?>
+                <div class="alert alert-success">
+                    <?php echo e(session()->get('message')); ?>
 
-                    </div>
-                    <?php endif; ?>
-                    <?php if($errors->any()): ?>
-                    <div class="">
-                        <ul>
-                            <?php $__currentLoopData = $errors->all(); $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $error): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
-                            <li><?php echo e($error); ?></li>
-                            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
-                        </ul>
-                    </div>
-                    <?php endif; ?>
-<br>
+                </div>
+                <?php endif; ?>
+                <?php if($errors->any()): ?>
+                <div class="">
+                    <ul>
+                        <?php $__currentLoopData = $errors->all(); $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $error): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                        <li><?php echo e($error); ?></li>
+                        <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+                    </ul>
+                </div>
+                <?php endif; ?>
+                <br>
                 <div class="accordion col" id="accordionExample">
                     <div class="card">
                         <div class="card-header" id="headingOne">
@@ -137,7 +133,7 @@
                                             <td><a href="<?php echo e(asset('storage/'.$oneProfile->iapp_record)); ?>" target="_blank"><button class="btn btn-primary">Download</button></a></td>
                                         </tr>
                                         <tr>
-                                            <td>Marchinery Particulars </td>
+                                            <td>Machinery Particulars </td>
                                             <td><a href="<?php echo e(asset('storage/'.$oneProfile->machinery_particulars)); ?>" target="_blank"><button class="btn btn-primary">Download</button></a></td>
                                         </tr>
                                         <tr>
@@ -196,6 +192,7 @@
                                     <thead>
                                         <tr>
                                             <th scope="col">Document Name</th>
+                                            <th scope="col">Uploaded By</th>
                                             <th scope="col">File</th>
                                         </tr>
                                     </thead>
@@ -203,19 +200,88 @@
                                         <?php $__currentLoopData = $other_files_list; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $other_file): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                                         <tr>
                                             <td><?php echo e($other_file->description); ?></td>
+                                            <td><?php echo e($other_file->uploaded_by); ?></td>
                                             <td><a href="<?php echo e(asset('storage/'.$other_file->other_file_upload)); ?>"><button class="btn btn-primary">Download</button></a></td>
                                         </tr>
                                         <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                                     </tbody>
                                 </table>
-                                
+
                             </div>
                         </div>
                     </div>
+                    <div class="card">
+                        <div class="card-header" id="headingFour">
+                            <h5 class="mb-0">
+                                <button class="btn btn-link collapsed" data-toggle="collapse" data-target="#collapseFour" aria-expanded="false" aria-controls="collapseFour">
+                                    Financials - Payments, Proof of Payment, etc.
+                                </button>
+                            </h5>
+                        </div>
+                        <div id="collapseFour" class="collapse" aria-labelledby="headingFour" data-parent="#accordion">
+                            <div class="card-body">
+                            <?php if(!Auth::user()->hasPermission('admin')): ?>
+                                <form method="post" action="<?php echo e(route('askforpayment')); ?>">
+                                    <?php echo csrf_field(); ?>
+                                    <div class="row">
+                                        <div class="col-lg-6 col-md-12 col-sm-12">
+                                            <label>File Description</label>
+                                            <input type="text" class="form-control" name="description">
+                                        </div>
+                                        <div class="col-lg-6 col-md-12 col-sm-12">
+                                            <input type="hidden" value="<?php echo e($id); ?>" name="id">
+                                            <label>Amount</label>
+                                            <input type="text" class="form-control" name="amount">
+                                            <input type="submit" value="Save" class="btn btn-primary mt-3">
+                                </form>
+                                <?php endif; ?>
+                            </div>
+                            <hr>
+                        </div>
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th scope="col">Description</th>
+                                    <th scope="col">Amount</th>
+                                    <th scope="col">Status</th>
+                                    <th scope="col">Action</th>
+                                </tr>
+                                <?php if($transactions == ''): ?>
+                                Oops! Nothing found!
+                                <?php endif; ?>
+                                <?php $__currentLoopData = $transactions; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $transaction): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                <tr>
+                                    <td><?php echo e($transaction->trans_description); ?></td>
+                                    <td>$<?php echo e(number_format($transaction->trans_amount)); ?></td>
+                                    <td><span class="badge<?php echo e($transaction->trans_status == NULL ? ' badge-danger' : 'badge-primary'); ?>"><?php echo e($transaction->trans_status == NULL ? 'Unpaid' : 'Paid'); ?></span></td>
+                                    <td>
+                                        <form id="paymentForm">
+                                            <input type="hidden" id="email-address" required value="<?php echo e($oneProfile->contact_email); ?>" />
+                                            <input type="hidden" id="amount" required value="<?php echo e($transaction->trans_amount); ?>" />
+                                            <input type="hidden" id="first-name" value="<?php echo e($oneProfile->contact_fname); ?>" />
+                                            <input type="hidden" id="last-name" value="<?php echo e($oneProfile->contact_lname); ?>" />
+                                            <button class="btn btn-primary" type="submit" onclick="payWithPaystack()"> Pay </button>
+                                        </form>
+                                            <?php if(Auth::user()->hasPermission('admin')): ?>
+                                            <a href="<?php echo e(url('mark-as-paid')); ?>/<?php echo e($id); ?>"><button class="btn btn-primary"> Mark as Paid </button></a>
+                                            <?php endif; ?>
+                                    </td>
+                                </tr>
+                                <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+                            </thead>
+                            <tbody>
+                            </tbody>
+                        </table>
+                    </div>
+                    </form>
                 </div>
             </div>
-
         </div>
     </div>
-    <?php $__env->stopSection(); ?>
+</div>
+</div>
+
+</div>
+</div>
+<?php $__env->stopSection(); ?>
 <?php echo $__env->make("layouts.dashboard", \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?><?php /**PATH /Applications/MAMP/htdocs/marianadash/resources/views/admin/view-profile.blade.php ENDPATH**/ ?>

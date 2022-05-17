@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Eexiprofile;
 use Illuminate\Http\Request;
 use App\Models\OtherFile;
+use App\Models\Transaction;
 
 class EexiController extends Controller
 {
@@ -154,6 +155,8 @@ class EexiController extends Controller
         $data['id'] = $request->id;
         $data['oneProfile'] = Eexiprofile::where('id', $request->id)->first();
         $data['other_files_list'] = OtherFile::where('eexiprofiles_id', $request->id)->get();
+        $data['transactions'] = Transaction::where('eexiprofiles_id', $request->id)->get();
+        $data['request_data'] = $request;
         //return $data['other_files_list'];
         return view('admin.view-profile')->with($data);
     }

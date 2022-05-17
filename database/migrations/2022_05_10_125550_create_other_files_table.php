@@ -16,6 +16,7 @@ class CreateOtherFilesTable extends Migration
         Schema::create('other_files', function (Blueprint $table) {
             $table->id();
             $table->integer('eexiprofiles_id')->unsigned();
+            $table->string('uploaded_by');
             $table->string('description');
             $table->string('other_file_upload');
             $table->timestamps();
