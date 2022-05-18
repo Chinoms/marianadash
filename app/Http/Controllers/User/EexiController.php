@@ -7,6 +7,7 @@ use App\Models\Eexiprofile;
 use Illuminate\Http\Request;
 use App\Models\OtherFile;
 use App\Models\Transaction;
+use Illuminate\Support\Facades\Auth;
 
 class EexiController extends Controller
 {
@@ -150,6 +151,7 @@ class EexiController extends Controller
     public function listProfiles()
     {
         $data['profiles'] = Eexiprofile::get();
+        $data['my_profiles'] = Eexiprofile::where('user_id', Auth::user()->id)->get();
         return view('admin/list-profiles')->with($data);
     }
 

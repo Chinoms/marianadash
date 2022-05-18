@@ -7,8 +7,11 @@
         <div class="container">
             <div class="row">
 
-                <?php if(Auth::user()->hasRole('admin')): ?>
-                dddsfs
+                <?php if(session()->has('message')): ?>
+                <div class="alert alert-success">
+                    <?php echo e(session()->get('message')); ?>
+
+                </div>
                 <?php endif; ?>
 
                 <table class="table table-striped">
@@ -22,6 +25,7 @@
                         </tr>
                     </thead>
                     <tbody>
+                        <?php if(Auth::user()->hasPermission('admin')): ?>
                         <?php $__currentLoopData = $profiles; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $profile): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                         <tr>
                             <td><?php echo e($loop->iteration); ?></td>
@@ -31,6 +35,19 @@
                             <td><a href="view-profile/<?php echo e($profile->id); ?>"><button class="btn btn-primary">View Profile</button></a></td>
                         </tr>
                         <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+                        <?php endif; ?>
+
+                        <?php if(!Auth::user()->hasPermission('admin')): ?>
+                        <?php $__currentLoopData = $my_profiles; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $my_profile): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                        <tr>
+                            <td><?php echo e($loop->iteration); ?></td>
+                            <td><?php echo e($my_profile->ship_name); ?></td>
+                            <td><?php echo e($my_profile->contact_fname); ?> <?php echo e($profile->contact_lname); ?></td>
+                            <td><?php echo e($my_profile->contact_email); ?> </td>
+                            <td><a href="view-profile/<?php echo e($profile->id); ?>"><button class="btn btn-primary">View Profile</button></a></td>
+                        </tr>
+                        <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+                        <?php endif; ?>
                     </tbody>
                 </table>
 
